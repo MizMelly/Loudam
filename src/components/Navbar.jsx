@@ -1,17 +1,34 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const token = localStorage.getItem("token");
 
+  // ✅ Improved scroll system (works from any page)
   const scrollToSection = (id) => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    const isHome = location.pathname === "/" || location.pathname === "/home";
+
+    const performScroll = () => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    };
+
+    if (!isHome) {
+      navigate("/home");
+
+      setTimeout(() => {
+        performScroll();
+      }, 300);
+    } else {
+      performScroll();
     }
+
     setIsOpen(false);
   };
 
@@ -23,7 +40,6 @@ const Navbar = () => {
     }
   };
 
-  // ✅ Prevent background scroll when menu is open
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "auto";
   }, [isOpen]);
@@ -93,6 +109,7 @@ const Navbar = () => {
                   For Businesses
                 </button>
 
+                {/* ✅ FIXED: Brands works properly */}
                 <button
                   onClick={() => navigate("/brands")}
                   className="hover:text-white transition"
@@ -127,23 +144,22 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* ✅ Overlay */}
+      {/* Overlay */}
       <div
         className={`fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 ${
           isOpen ? "opacity-100 visible" : "opacity-0 invisible"
         }`}
         onClick={() => setIsOpen(false)}
-      ></div>
+      />
 
-      {/* ✅ Side Drawer */}
+      {/* Side Drawer */}
       <div
-        className={`fixed top-0 right-0 h-full w-[75%] sm:w-87.5 bg-[#173B6C] z-50 transform transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 right-0 h-full w-[75%] bg-[#173B6C] z-50 transform transition-transform duration-300 ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <div className="flex flex-col h-full p-6 text-blue-200">
 
-          {/* Close Button */}
           <div className="flex justify-end mb-8">
             <button
               onClick={() => setIsOpen(false)}
@@ -153,7 +169,6 @@ const Navbar = () => {
             </button>
           </div>
 
-          {/* Menu Items */}
           <div className="flex flex-col gap-6 text-lg">
 
             {token ? (
@@ -178,7 +193,7 @@ const Navbar = () => {
 
                 <button
                   onClick={handleLogout}
-                  className="mt-4 border border-white px-4 py-2 rounded-xl hover:bg-white hover:text-[#173B6C] transition"
+                  className="mt-4 border border-white px-4 py-2 rounded-xl"
                 >
                   Logout
                 </button>
@@ -216,7 +231,7 @@ const Navbar = () => {
                     navigate("/file-complaint");
                     setIsOpen(false);
                   }}
-                  className="bg-orange-500 hover:bg-orange-600 px-5 py-3 rounded-lg font-semibold text-white transition mt-4"
+                  className="bg-orange-500 px-5 py-3 rounded-lg mt-4"
                 >
                   File a Complaint
                 </button>
