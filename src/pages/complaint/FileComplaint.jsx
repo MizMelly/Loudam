@@ -148,14 +148,46 @@ const FileComplaint = () => {
                 <h3 className="font-semibold text-lg mb-4 text-gray-800">Complaint Details</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <input type="text" name="business_name" placeholder="Business / Brand Name *" value={formData.business_name} onChange={handleChange} required className="border border-gray-300 rounded-xl px-4 py-3" />
-                  <select name="category" value={formData.category} onChange={handleChange} required className="border border-gray-300 rounded-xl px-4 py-3">
-                    <option value="">Select Category</option>
-                    <option value="Billing Issue">Billing Issue</option>
-                    <option value="Poor Service">Poor Service</option>
-                    <option value="Delivery Issue">Delivery Issue</option>
-                    <option value="Fraud">Fraud</option>
-                    <option value="Refund Delay">Refund Delay</option>
-                  </select>
+                  <select
+  name="category"
+  value={formData.category}
+  onChange={handleChange}
+  required
+  className="border border-gray-300 rounded-xl px-4 py-3"
+>
+  <option value="">Select Category</option>
+
+  {/* Banking */}
+  <option value="Banking - Account Issues">Banking · Account Issues</option>
+  <option value="Banking - Card Services">Banking · Card Services</option>
+
+  {/* Telecoms */}
+  <option value="Telecoms - Billing">Telecoms · Billing</option>
+  <option value="Telecoms - Network">Telecoms · Network</option>
+
+  {/* Aviation */}
+  <option value="Aviation - Flight Issues">Aviation · Flight Issues</option>
+  <option value="Aviation - Refund">Aviation · Refund</option>
+
+  {/* E-commerce */}
+  <option value="E-commerce - Delivery">E-commerce · Delivery</option>
+  <option value="E-commerce - Product Quality">E-commerce · Product Quality</option>
+
+  {/* Logistics */}
+  <option value="Logistics - Delayed Delivery">Logistics · Delayed Delivery</option>
+
+  {/* Utilities */}
+  <option value="Utilities - Power Supply">Utilities · Power Supply</option>
+  <option value="Utilities - Billing">Utilities · Billing</option>
+
+  {/* General */}
+  <option value="Billing Issue">Billing Issue</option>
+  <option value="Poor Service">Poor Service</option>
+  <option value="Delivery Issue">Delivery Issue</option>
+  <option value="Fraud">Fraud</option>
+  <option value="Refund Delay">Refund Delay</option>
+  <option value="Other">Other</option>
+</select>
                 </div>
 
                 <input type="text" name="subject" placeholder="Subject *" value={formData.subject} onChange={handleChange} required className="mt-6 w-full border border-gray-300 rounded-xl px-4 py-3" />

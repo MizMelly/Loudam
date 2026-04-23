@@ -6,7 +6,7 @@ const Hero = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="bg-linear-to-b from-[#0E355F] via-[#123E6E] to-[#17487A] text-white pt-24 pb-20 relative">
+    <section className="bg-linear-to-b from-[#0E355F] via-[#123E6E] to-[#17487A] text-white pt-20 pb-20 relative">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
 
@@ -56,7 +56,7 @@ const Hero = () => {
             </div>
 
             {/* Stats */}
-            <div className="flex items-center gap-8 pt-6 text-sm text-[#7FA6C9]">
+            <div className="flex flex-row items-center justify-center lg:justify-start gap-6 sm:gap-8 pt-6 text-xs sm:text-sm text-[#7FA6C9] whitespace-nowrap">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 bg-green-400 rounded-full"></span>
                 1,000+ Complaints Resolved

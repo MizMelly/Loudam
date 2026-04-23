@@ -60,17 +60,16 @@ const RecentComplaints = () => {
   };
 
   return (
-    <section className="py-24 bg-[#F3F6F9] overflow-hidden">
-      <div className="max-w-7xl mx-auto px-3">
+    <section className="py-16 sm:py-20 bg-[#F3F6F9] overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Header */}
-        <div className="flex items-end justify-between mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
           <div>
             <h4 className="text-2xl sm:text-3xl font-bold text-[#1F2A37]">
               Recent Complaints
             </h4>
-
-            <p className="text-lg text-[#6B7C93] mt-3">
+            <p className="text-base sm:text-lg text-[#6B7C93] mt-2">
               Latest accountability reports from consumers.
             </p>
           </div>
@@ -83,9 +82,9 @@ const RecentComplaints = () => {
           </button>
         </div>
 
-        {/* Moving Cards */}
-        <div className="relative">
-          <div className="flex gap-6 animate-scroll">
+        {/* Animated Row */}
+        <div className="relative overflow-hidden">
+          <div className="flex gap-4 sm:gap-6 w-max animate-scroll hover:[animation-play-state:paused]">
 
             {[...complaints, ...complaints].map((complaint, index) => {
               const status = getStatusConfig(complaint.status);
@@ -93,7 +92,19 @@ const RecentComplaints = () => {
               return (
                 <div
                   key={index}
-                  className="min-w-[320px] bg-[#F8FAFC] rounded-2xl p-7 border border-gray-200 shadow-sm hover:shadow-md transition"
+                  className="
+                    w-[85vw] 
+                    sm:w-75 
+                    md:w-[320px] 
+                    lg:w-85
+                    bg-[#F8FAFC] 
+                    rounded-2xl 
+                    p-5 sm:p-6 
+                    border border-gray-200 
+                    shadow-sm 
+                    hover:shadow-md 
+                    transition
+                  "
                 >
                   <div className="flex justify-between items-start mb-4">
                     <div>
@@ -101,28 +112,28 @@ const RecentComplaints = () => {
                         {complaint.id}
                       </p>
 
-                      <h3 className="font-semibold text-lg mt-2 text-[#1F2A37]">
+                      <h3 className="font-semibold text-base sm:text-lg mt-2 text-[#1F2A37]">
                         {complaint.title}
                       </h3>
                     </div>
 
                     <span
-                      className={`px-3 py-1 text-xs font-medium rounded-full ${status.className}`}
+                      className={`px-2 sm:px-3 py-1 text-[10px] sm:text-xs font-medium rounded-full ${status.className}`}
                     >
                       {status.label}
                     </span>
                   </div>
 
-                  <p className="text-sm text-[#6B7C93] mb-3">
+                  <p className="text-sm text-[#6B7C93] mb-2">
                     {complaint.category}
                   </p>
 
-                  <p className="text-sm text-gray-500 mb-6">
+                  <p className="text-xs sm:text-sm text-gray-500 mb-5">
                     {complaint.time}
                   </p>
 
-                  <div className="pt-4 border-t border-gray-200 flex items-center gap-3">
-                    <div className="w-8 h-8 bg-[#173B6C] text-white rounded-full flex items-center justify-center text-xs font-semibold">
+                  <div className="pt-3 border-t border-gray-200 flex items-center gap-3">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 bg-[#173B6C] text-white rounded-full flex items-center justify-center text-xs font-semibold">
                       {complaint.business.substring(0, 2)}
                     </div>
 

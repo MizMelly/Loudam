@@ -1,178 +1,133 @@
-import React, { useState } from 'react';
-import Navbar from '../../components/Navbar';   
-import Footer from '../../components/Footer';
-
+import React, { useEffect, useState } from "react";
+import Navbar from "../../components/Navbar";
+import Footer from "../../components/Footer";
 
 const brandsData = [
-  {
-    id: "J",
-    name: "Jumia",
-    industry: "E-COMMERCE",
-    complaints: "2,340",
-    resolved: "1,520",
-    avgDays: "4.7",
-    index: "64",
-    indexColor: "text-amber-600"
-  },
-  {
-    id: "FB",
-    name: "First Bank",
-    industry: "BANKING",
-    complaints: "1,890",
-    resolved: "980",
-    avgDays: "6.3",
-    index: "55",
-    indexColor: "text-amber-600"
-  },
-  {
-    id: "AN",
-    name: "Airtel Nigeria",
-    industry: "TELECOMS",
-    complaints: "2,100",
-    resolved: "1,340",
-    avgDays: "4.5",
-    index: "62",
-    indexColor: "text-amber-600"
-  },
-  {
-    id: "D",
-    name: "DSTV",
-    industry: "ENTERTAINMENT",
-    complaints: "1,650",
-    resolved: "740",
-    avgDays: "7.2",
-    index: "49",
-    indexColor: "text-red-600"
-  },
-  {
-    id: "I",
-    name: "IBEDC",
-    industry: "UTILITIES",
-    complaints: "980",
-    resolved: "280",
-    avgDays: "12.5",
-    index: "31",
-    indexColor: "text-red-600"
-  },
-  {
-    id: "B",
-    name: "Bolt",
-    industry: "TRANSPORTATION",
-    complaints: "760",
-    resolved: "520",
-    avgDays: "3.8",
-    index: "68",
-    indexColor: "text-emerald-600"
-  },
-  {
-    id: "AB",
-    name: "Access Bank",
-    industry: "BANKING",
-    complaints: "1,402",
-    resolved: "980",
-    avgDays: "3.2",
-    index: "72",
-    indexColor: "text-emerald-600"
-  },
-  {
-    id: "MN",
-    name: "MTN Nigeria",
-    industry: "TELECOMS",
-    complaints: "3,201",
-    resolved: "1,840",
-    avgDays: "5.1",
-    index: "58",
-    indexColor: "text-amber-600"
-  }
+  { name: "First Bank", a: 30, b: 25 },
+  { name: "Airtel", a: 65, b: 45 },
+  { name: "DSTV", a: 22, b: 35 },
+  { name: "IBEDC", a: 10, b: 18 },
+  { name: "Bolt", a: 55, b: 40 },
+  { name: "Access", a: 59, b: 50 },
+  { name: "MTN", a: 33, b: 28 },
+  { name: "Air Peace", a: 48, b: 38 },
 ];
 
-const Brands = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+const max = 100;
 
-  const filteredBrands = brandsData.filter(brand =>
-    brand.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    brand.industry.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+const Brands = () => {
+  const [animate, setAnimate] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setAnimate(true), 200);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-    {/* Navbar */}
       <Navbar />
 
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-6xl mx-auto px-6">
-        {/* Header */}
-        <div className="mb-10">
-          <h1 className="text-4xl font-bold text-gray-900">Brand Directory</h1>
-          <p className="text-gray-600 mt-2">
-            Accountability scores based on resolution speed and volume.
-          </p>
-        </div>
+      <div className="flex-1 py-10">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
 
-        {/* Search Bar */}
-        <div className="mb-10">
-          <div className="relative max-w-md">
-            <input
-              type="text"
-              placeholder="Search brands..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-5 py-4 bg-white border border-gray-200 rounded-2xl focus:outline-none focus:border-orange-500 text-sm"
-            />
-            <span className="absolute left-5 top-4.5 text-gray-400">🔍</span>
+          {/* TITLE */}
+          <div className="mb-8">
+            <h1 className="text-2xl sm:text-4xl font-bold text-gray-900">
+              Brand Analytics Dashboard
+            </h1>
+            <p className="text-gray-600 mt-2 text-sm sm:text-base">
+              Accountability scores based on resolution speed and volume.
+            </p>
           </div>
-        </div>
 
-        {/* Brands List */}
-        <div className="space-y-4">
-          {filteredBrands.map((brand) => (
-            <div
-              key={brand.id}
-              className="bg-white rounded-3xl p-8 flex items-center justify-between border border-gray-100 hover:shadow-md transition-all group"
-            >
-              <div className="flex items-center gap-6">
-                {/* Logo Circle */}
-                <div className="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center text-xl font-bold text-gray-700 group-hover:bg-orange-100 transition-colors">
-                  {brand.id}
-                </div>
+          {/* CARD */}
+          <div className="bg-white rounded-3xl p-5 sm:p-10 border border-gray-100">
 
-                <div>
-                  <div className="flex items-center gap-3">
-                    <h3 className="font-semibold text-xl text-gray-900">{brand.name}</h3>
-                    <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full font-medium">
-                      {brand.industry}
-                    </span>
-                  </div>
-                  <div className="text-sm text-gray-500 mt-2">
-                    {brand.complaints} complaints • {brand.resolved} resolved • Avg. {brand.avgDays} days
-                  </div>
-                </div>
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-8">
+              Performance Overview
+            </h2>
+
+            {/* CHART */}
+            <div className="relative h-90">
+
+              {/* GRID */}
+              <div className="absolute inset-0 flex flex-col justify-between opacity-20">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="border-t border-gray-400" />
+                ))}
               </div>
 
-              {/* Score */}
-              <div className="text-right">
-                <div className={`text-5xl font-bold ${brand.indexColor}`}>
-                  {brand.index}
+              {/* Y AXIS */}
+              <div className="absolute left-0 top-0 h-full flex flex-col justify-between text-xs text-gray-500 pr-2">
+                <span>100</span>
+                <span>75</span>
+                <span>50</span>
+                <span>25</span>
+                <span>0</span>
+              </div>
+
+              {/* SCROLL WRAPPER (MOBILE FIX) */}
+              <div className="ml-8 overflow-x-auto h-full">
+                <div className="flex items-end gap-6 min-w-175 sm:min-w-full h-full">
+
+                  {brandsData.map((item, i) => (
+                    <div
+                      key={i}
+                      className="flex flex-col items-center justify-end flex-1"
+                    >
+                      {/* BAR GROUP */}
+                      <div className="flex items-end gap-2 h-70">
+
+                        {/* BLUE BAR */}
+                        <div
+                          className="w-3 sm:w-4 bg-blue-500 rounded-t-md transition-all duration-700 ease-out"
+                          style={{
+                            height: animate ? `${(item.a / max) * 100}%` : "0%",
+                            transitionDelay: `${i * 80}ms`,
+                          }}
+                        />
+
+                        {/* ORANGE BAR */}
+                        <div
+                          className="w-3 sm:w-4 bg-orange-500 rounded-t-md transition-all duration-700 ease-out"
+                          style={{
+                            height: animate ? `${(item.b / max) * 100}%` : "0%",
+                            transitionDelay: `${i * 80}ms`,
+                          }}
+                        />
+                      </div>
+
+                      {/* LABEL */}
+                      <span className="text-[10px] sm:text-xs text-gray-600 mt-3 text-center whitespace-nowrap">
+                        {item.name}
+                      </span>
+                    </div>
+                  ))}
+
                 </div>
-                <p className="text-xs text-gray-500 tracking-widest mt-1">INDEX</p>
               </div>
             </div>
-          ))}
-        </div>
 
-        {filteredBrands.length === 0 && (
-          <div className="text-center py-20 text-gray-500">
-            No brands found matching your search.
+            {/* LEGEND */}
+            <div className="flex gap-6 mt-6 text-sm text-gray-600">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-blue-500"></div>
+                Metric A
+              </div>
+
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-orange-500"></div>
+                Metric B
+              </div>
+            </div>
+
           </div>
-        )}
+        </div>
       </div>
-    </div>
 
-    {/* Footer */}
       <Footer />
     </div>
-  
-);
+  );
 };
 
 export default Brands;
