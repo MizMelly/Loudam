@@ -1,9 +1,8 @@
-// src/pages/Home.jsx
 import React from 'react';
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';    
-import HowItworks from '../components/HowItWorks';
-import Whyloudam from '../components/WhyLoudam';
+import HowItWorks from '../components/HowItWorks';
+import WhyLoudam from '../components/WhyLoudam';
 import StatsBar from '../components/StatsBar';
 import DataSection from '../components/DataSection';
 import Footer from '../components/Footer';
@@ -15,22 +14,18 @@ const Home = () => {
       <Navbar />
       <Hero />
 
-      {/* Add IDs for smooth scroll */}
       <div id="how-it-works">
-        <HowItworks />
+        <HowItWorks />
       </div>
 
       <div id="why-loudam">
-        <Whyloudam />
+        <WhyLoudam />
       </div>
+
       <RecentComplaints />
 
-      {/* Optional sections without scroll */}
       <StatsBar />
-     
-        <DataSection />
-       
-      
+      <DataSection />
 
       <Footer />
     </div>
