@@ -8,7 +8,7 @@ import ForgotPassword from './pages/auth/ForgotPassword';
 import Dashboard from './pages/dashboard/Dashboard';
 import FileComplaint from './pages/complaint/FileComplaint';
 import TrackComplaints from './pages/complaint/TrackComplaints';
-import AdminDashboard from './pages/admin/Admindashboard';
+import AdminDashboard from './pages/admin/AdminDashboard';
 import Brands from './components/brands/brands';
 
 const ProtectedRoute = ({ children, isAuthenticated }) => {
