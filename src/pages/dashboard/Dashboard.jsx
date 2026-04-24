@@ -66,12 +66,7 @@ const Dashboard = () => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    navigate('/login');
-  };
-
+  
   // 📊 FIXED STATS (no design change)
   const total = complaints.length;
 
@@ -125,13 +120,6 @@ const Dashboard = () => {
               className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-2xl font-semibold flex items-center gap-2"
             >
               + New Complaint
-            </button>
-
-            <button
-              onClick={handleLogout}
-              className="border border-red-500 text-red-500 px-4 py-2 rounded-xl"
-            >
-              Logout
             </button>
           </div>
         </div>
