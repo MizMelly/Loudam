@@ -18,7 +18,7 @@ const TrackComplaints = () => {
 
     const fetchComplaints = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/complaints/my', {
+        const res = await fetch('https://loudambackend.onrender.com/api/complaints/my', {
           headers: { 
             'Authorization': `Bearer ${token}` 
           }

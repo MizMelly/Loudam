@@ -28,7 +28,7 @@ const AdminDashboard = () => {
 
       try {
         const res = await fetch(
-          "http://localhost:5000/api/admin/complaints",
+          "https://loudambackend.onrender.com/api/admin/complaints",
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -50,7 +50,7 @@ const AdminDashboard = () => {
 
     try {
       await fetch(
-        `http://localhost:5000/api/admin/complaints/${id}/status`,
+        `https://loudambackend.onrender.com/api/admin/complaints/${id}/status`,
         {
           method: "PUT",
           headers: {

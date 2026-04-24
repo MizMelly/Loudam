@@ -67,7 +67,7 @@ const FileComplaint = () => {
 
     console.log("Submitting complaint...", token ? "with token" : "as guest");
 
-    const res = await fetch('http://localhost:5000/api/complaints', {
+    const res = await fetch('https://loudambackend.onrender.com/api/complaints', {
       method: 'POST',
       headers: headers,        // Send token if available
       body: data,

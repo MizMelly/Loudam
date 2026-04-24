@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:5000/api/admin';
+const BASE_URL = 'https://loudambackend.onrender.com/api/admin';
 const getToken = () => localStorage.getItem('token');
 
 export const apiAdmin = {
