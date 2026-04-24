@@ -25,7 +25,7 @@ const FileComplaint = () => {
   const [success, setSuccess] = useState(false);
   const [trackingId, setTrackingId] = useState('');
 
-  const token = localStorage.getItem('token'); // Check if user is logged in
+  const token = localStorage.getItem('token');
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -40,187 +40,242 @@ const FileComplaint = () => {
     setProof(file);
   };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-  setError('');
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
 
-  try {
-    const data = new FormData();
+    try {
+      const data = new FormData();
 
-    Object.keys(formData).forEach(key => {
-      if (formData[key] !== undefined && formData[key] !== '') {
-        data.append(key, formData[key]);
-      }
-    });
-
-    if (proof) {
-      data.append('proof', proof);
-    }
-
-    const token = localStorage.getItem('token');
-
-    const headers = {};
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    console.log("Submitting complaint...", token ? "with token" : "as guest");
-
-    const res = await fetch('https://loudambackend.onrender.com/api/complaints', {
-      method: 'POST',
-      headers: headers,        // Send token if available
-      body: data,
-    });
-
-    const result = await res.json();
-    console.log("Backend response:", result);
-
-    if (res.ok && result.success) {
-      setSuccess(true);
-      setTrackingId(result.trackingId || 'N/A');
-      
-      alert(`✅ Complaint submitted successfully!\n\nTracking ID: ${result.trackingId || 'N/A'}`);
-
-      // Reset form
-      setFormData({
-        full_name: '', phone_number: '', email: '', country: 'Nigeria',
-        social_handle: '', business_name: '', category: '', subject: '',
-        description: '', desiredResolution: ''
+      Object.keys(formData).forEach(key => {
+        if (formData[key]) {
+          data.append(key, formData[key]);
+        }
       });
-      setProof(null);
-    } else {
-      setError(result.message || "Failed to submit complaint");
+
+      if (proof) data.append('proof', proof);
+
+      const headers = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const res = await fetch('https://loudambackend.onrender.com/api/complaints', {
+        method: 'POST',
+        headers,
+        body: data,
+      });
+
+      const result = await res.json();
+
+      if (res.ok && result.success) {
+        setSuccess(true);
+        setTrackingId(result.trackingId);
+
+        alert(`Complaint submitted!\nTracking ID: ${result.trackingId}`);
+
+        setFormData({
+          full_name: '',
+          phone_number: '',
+          email: '',
+          country: 'Nigeria',
+          social_handle: '',
+          business_name: '',
+          category: '',
+          subject: '',
+          description: '',
+          desiredResolution: ''
+        });
+
+        setProof(null);
+      } else {
+        setError(result.message || "Submission failed");
+      }
+
+    // eslint-disable-next-line no-unused-vars
+    } catch (err) {
+      setError("Server error. Try again.");
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    console.error("Submit error:", err);
-    setError("Cannot connect to server. Please make sure backend is running.");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F5F7FA]">
       <Navbar />
 
-      <div className="flex-1 py-12">
-        <div className="max-w-4xl mx-auto px-6">
+      <div className="flex-1 py-8 md:py-12">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
-          {/* Back Button - Smart: Dashboard if logged in, Home if not */}
           <button
             onClick={() => navigate(token ? '/dashboard' : '/')}
-            className="text-gray-500 hover:text-gray-800 flex items-center gap-2 text-sm mb-6"
+            className="text-gray-500 hover:text-gray-800 flex items-center gap-2 text-sm mb-4 md:mb-6"
           >
             ← Back
           </button>
 
-          <h1 className="text-4xl font-bold text-[#0A2540] mb-2">File a Complaint</h1>
-          <p className="text-gray-600 mb-10">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#0A2540] mb-2">
+            File a Complaint
+          </h1>
+
+          <p className="text-gray-600 mb-8 md:mb-10 text-sm md:text-base">
             No login required to submit. {token && "You are currently logged in."}
           </p>
 
           {success && (
-            <div className="bg-green-100 border border-green-400 text-green-700 px-6 py-5 rounded-2xl mb-8">
+            <div className="bg-green-100 border border-green-400 text-green-700 px-4 md:px-6 py-4 md:py-5 rounded-2xl mb-6 md:mb-8 text-sm md:text-base">
               Complaint submitted successfully!<br />
-              Tracking ID: <strong>{trackingId}</strong><br />
-              A confirmation email has been sent to your email address.
+              Tracking ID: <strong>{trackingId}</strong>
             </div>
           )}
 
-          {error && <p className="text-red-600 bg-red-50 p-4 rounded-xl mb-6">{error}</p>}
+          {error && (
+            <p className="text-red-600 bg-red-50 p-3 md:p-4 rounded-xl mb-6 text-sm md:text-base">
+              {error}
+            </p>
+          )}
 
-          <div className="bg-white rounded-3xl shadow p-8 md:p-10 border border-gray-100">
-            <form onSubmit={handleSubmit} className="space-y-8">
+          <div className="bg-white rounded-2xl md:rounded-3xl shadow p-5 sm:p-6 md:p-10 border border-gray-100">
 
-              {/* Your Information */}
+            <form onSubmit={handleSubmit} className="space-y-6 md:space-y-8">
+
+              {/* USER INFO */}
               <div>
-                <h3 className="font-semibold text-lg mb-4 text-gray-800">Your Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <input type="text" name="full_name" placeholder="Full Name *" value={formData.full_name} onChange={handleChange} required className="border border-gray-300 rounded-xl px-4 py-3" />
-                  <input type="tel" name="phone_number" placeholder="Phone Number *" value={formData.phone_number} onChange={handleChange} required className="border border-gray-300 rounded-xl px-4 py-3" />
-                  <input type="email" name="email" placeholder="Email Address *" value={formData.email} onChange={handleChange} required className="border border-gray-300 rounded-xl px-4 py-3 md:col-span-2" />
+                <h3 className="font-semibold text-base md:text-lg mb-4 text-gray-800">
+                  Your Information
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+
+                  <input
+                    type="text"
+                    name="full_name"
+                    placeholder="Full Name *"
+                    value={formData.full_name}
+                    onChange={handleChange}
+                    required
+                    className="border border-gray-300 rounded-xl px-4 py-3 text-sm md:text-base"
+                  />
+
+                  <input
+                    type="tel"
+                    name="phone_number"
+                    placeholder="Phone Number *"
+                    value={formData.phone_number}
+                    onChange={handleChange}
+                    required
+                    className="border border-gray-300 rounded-xl px-4 py-3 text-sm md:text-base"
+                  />
+
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Email Address *"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    className="border border-gray-300 rounded-xl px-4 py-3 text-sm md:text-base md:col-span-2"
+                  />
+
                 </div>
               </div>
 
-              {/* Complaint Details */}
+              {/* DETAILS */}
               <div>
-                <h3 className="font-semibold text-lg mb-4 text-gray-800">Complaint Details</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <input type="text" name="business_name" placeholder="Business / Brand Name *" value={formData.business_name} onChange={handleChange} required className="border border-gray-300 rounded-xl px-4 py-3" />
+                <h3 className="font-semibold text-base md:text-lg mb-4 text-gray-800">
+                  Complaint Details
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+
+                  <input
+                    type="text"
+                    name="business_name"
+                    placeholder="Business Name *"
+                    value={formData.business_name}
+                    onChange={handleChange}
+                    required
+                    className="border border-gray-300 rounded-xl px-4 py-3 text-sm md:text-base"
+                  />
+
                   <select
-  name="category"
-  value={formData.category}
-  onChange={handleChange}
-  required
-  className="border border-gray-300 rounded-xl px-4 py-3"
->
-  <option value="">Select Category</option>
+                    name="category"
+                    value={formData.category}
+                    onChange={handleChange}
+                    required
+                    className="border border-gray-300 rounded-xl px-4 py-3 text-sm md:text-base"
+                  >
+                    <option value="">Select Category</option>
+                    <option value="Banking">Banking</option>
+                    <option value="Telecoms">Telecoms</option>
+                    <option value="E-commerce">E-commerce</option>
+                    <option value="Logistics">Logistics</option>
+                    <option value="Utilities">Utilities</option>
+                    <option value="Fraud">Fraud</option>
+                    <option value="Other">Other</option>
+                  </select>
 
-  {/* Banking */}
-  <option value="Banking - Account Issues">Banking · Account Issues</option>
-  <option value="Banking - Card Services">Banking · Card Services</option>
-
-  {/* Telecoms */}
-  <option value="Telecoms - Billing">Telecoms · Billing</option>
-  <option value="Telecoms - Network">Telecoms · Network</option>
-
-  {/* Aviation */}
-  <option value="Aviation - Flight Issues">Aviation · Flight Issues</option>
-  <option value="Aviation - Refund">Aviation · Refund</option>
-
-  {/* E-commerce */}
-  <option value="E-commerce - Delivery">E-commerce · Delivery</option>
-  <option value="E-commerce - Product Quality">E-commerce · Product Quality</option>
-
-  {/* Logistics */}
-  <option value="Logistics - Delayed Delivery">Logistics · Delayed Delivery</option>
-
-  {/* Utilities */}
-  <option value="Utilities - Power Supply">Utilities · Power Supply</option>
-  <option value="Utilities - Billing">Utilities · Billing</option>
-
-  {/* General */}
-  <option value="Billing Issue">Billing Issue</option>
-  <option value="Poor Service">Poor Service</option>
-  <option value="Delivery Issue">Delivery Issue</option>
-  <option value="Fraud">Fraud</option>
-  <option value="Refund Delay">Refund Delay</option>
-  <option value="Other">Other</option>
-</select>
                 </div>
 
-                <input type="text" name="subject" placeholder="Subject *" value={formData.subject} onChange={handleChange} required className="mt-6 w-full border border-gray-300 rounded-xl px-4 py-3" />
+                <input
+                  name="subject"
+                  placeholder="Subject *"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  required
+                  className="mt-5 md:mt-6 w-full border border-gray-300 rounded-xl px-4 py-3 text-sm md:text-base"
+                />
 
-                <textarea name="description" placeholder="Describe what happened..." value={formData.description} onChange={handleChange} required rows="5" className="mt-6 w-full border border-gray-300 rounded-2xl px-4 py-3" />
+                <textarea
+                  name="description"
+                  placeholder="Describe your issue..."
+                  value={formData.description}
+                  onChange={handleChange}
+                  required
+                  rows="4"
+                  className="mt-5 md:mt-6 w-full border border-gray-300 rounded-2xl px-4 py-3 text-sm md:text-base"
+                />
 
-                <textarea name="desiredResolution" placeholder="How would you like this resolved?" value={formData.desiredResolution} onChange={handleChange} rows="3" className="mt-6 w-full border border-gray-300 rounded-2xl px-4 py-3" />
               </div>
 
-              {/* Proof Upload */}
+              {/* UPLOAD */}
               <div>
-                <label className="block text-sm text-gray-700 mb-2">Upload Proof (Optional)</label>
+                <label className="block text-sm mb-2">Upload Proof (Optional)</label>
+
                 <div
                   onClick={() => document.getElementById('proof').click()}
-                  onDragOver={(e) => e.preventDefault()}
-                  onDrop={(e) => { e.preventDefault(); handleFile(e.dataTransfer.files[0]); }}
-                  className="border-2 border-dashed border-gray-300 rounded-2xl p-10 text-center cursor-pointer hover:border-orange-400 transition"
+                  className="border-2 border-dashed border-gray-300 rounded-2xl p-6 md:p-10 text-center cursor-pointer hover:border-orange-400 transition"
                 >
-                  <p className="text-gray-500">Click or drag & drop files here</p>
-                  <p className="text-xs text-gray-400 mt-1">PNG, JPG, PDF (max 5MB)</p>
+                  <p className="text-gray-500 text-sm md:text-base">
+                    Click or drag & drop file
+                  </p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    PNG, JPG, PDF (max 5MB)
+                  </p>
                 </div>
-                <input id="proof" type="file" accept=".png,.jpg,.jpeg,.pdf" className="hidden" onChange={(e) => handleFile(e.target.files[0])} />
 
-                {proof && <p className="text-green-600 text-sm mt-2">✓ {proof.name}</p>}
+                <input
+                  id="proof"
+                  type="file"
+                  className="hidden"
+                  onChange={(e) => handleFile(e.target.files[0])}
+                />
+
+                {proof && (
+                  <p className="text-green-600 text-sm mt-2">
+                    ✓ {proof.name}
+                  </p>
+                )}
               </div>
 
+              {/* BUTTON */}
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white py-4 rounded-2xl font-semibold text-lg disabled:opacity-70"
+                className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 md:py-4 rounded-2xl font-semibold text-base md:text-lg disabled:opacity-70"
               >
                 {loading ? "Submitting..." : "Submit Complaint"}
               </button>
+
             </form>
           </div>
         </div>
