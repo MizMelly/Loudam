@@ -141,16 +141,6 @@ const Login = ({ setIsAuthenticated }) => {
             />
           </div>
 
-          {/* APPLE LOGIN (RESTORED EXACT UI) */}
-          <button
-            onClick={handleAppleLogin}
-            className="w-full border border-gray-300 rounded-xl py-3 flex items-center justify-center gap-3 hover:bg-gray-50 transition mb-3"
-          >
-            <span className="text-lg"></span>
-            <span className="text-gray-700 font-medium">
-              Continue with Apple
-            </span>
-          </button>
 
           {/* DIVIDER */}
           <div className="flex items-center gap-3 my-6">
