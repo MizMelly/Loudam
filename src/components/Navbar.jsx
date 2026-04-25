@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { googleLogout } from "@react-oauth/google"; // ✅ ADD THIS
 
-const Navbar = () => {
+const Navbar = ({ setIsAuthenticated }) => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
   const token = localStorage.getItem("token");
 
-  // ✅ Improved scroll system (works from any page)
   const scrollToSection = (id) => {
     const isHome = location.pathname === "/" || location.pathname === "/home";
 
@@ -21,10 +21,7 @@ const Navbar = () => {
 
     if (!isHome) {
       navigate("/home");
-
-      setTimeout(() => {
-        performScroll();
-      }, 300);
+      setTimeout(() => performScroll(), 300);
     } else {
       performScroll();
     }
@@ -32,11 +29,27 @@ const Navbar = () => {
     setIsOpen(false);
   };
 
+  // ✅ 🔥 FIXED LOGOUT FUNCTION
   const handleLogout = () => {
     if (window.confirm("Are you sure you want to logout?")) {
+      // Clear your app session
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-      navigate("/home");
+
+      // 🔥 VERY IMPORTANT: Clear Google session
+      googleLogout();
+
+      // Extra safety (prevents auto account selection)
+      if (window.google?.accounts?.id) {
+        window.google.accounts.id.disableAutoSelect();
+      }
+
+      // Update auth state if you're using it globally
+      if (setIsAuthenticated) {
+        setIsAuthenticated(false);
+      }
+
+      navigate("/login", { replace: true });
     }
   };
 
@@ -72,17 +85,11 @@ const Navbar = () => {
           <div className="hidden md:flex items-center gap-8 text-[15px] font-medium text-blue-200">
             {token ? (
               <>
-                <button
-                  onClick={() => navigate("/track-complaints")}
-                  className="hover:text-white transition"
-                >
+                <button onClick={() => navigate("/track-complaints")} className="hover:text-white transition">
                   Track Complaint
                 </button>
 
-                <button
-                  onClick={() => navigate("/file-complaint")}
-                  className="hover:text-white transition"
-                >
+                <button onClick={() => navigate("/file-complaint")} className="hover:text-white transition">
                   File a Complaint
                 </button>
 
@@ -95,32 +102,19 @@ const Navbar = () => {
               </>
             ) : (
               <>
-                <button
-                  onClick={() => scrollToSection("how-it-works")}
-                  className="hover:text-white transition"
-                >
+                <button onClick={() => scrollToSection("how-it-works")} className="hover:text-white transition">
                   How It Works
                 </button>
 
-                <button
-                  onClick={() => scrollToSection("why-loudam")}
-                  className="hover:text-white transition"
-                >
+                <button onClick={() => scrollToSection("why-loudam")} className="hover:text-white transition">
                   For Businesses
                 </button>
 
-                {/* ✅ FIXED: Brands works properly */}
-                <button
-                  onClick={() => navigate("/brands")}
-                  className="hover:text-white transition"
-                >
+                <button onClick={() => navigate("/brands")} className="hover:text-white transition">
                   Brands
                 </button>
 
-                <button
-                  onClick={() => navigate("/login")}
-                  className="hover:text-white transition"
-                >
+                <button onClick={() => navigate("/login")} className="hover:text-white transition">
                   My Complaints
                 </button>
 
@@ -135,10 +129,7 @@ const Navbar = () => {
           </div>
 
           {/* Mobile Toggle */}
-          <button
-            onClick={() => setIsOpen(true)}
-            className="md:hidden text-2xl"
-          >
+          <button onClick={() => setIsOpen(true)} className="md:hidden text-2xl">
             ☰
           </button>
         </div>
@@ -161,40 +152,23 @@ const Navbar = () => {
         <div className="flex flex-col h-full p-6 text-blue-200">
 
           <div className="flex justify-end mb-8">
-            <button
-              onClick={() => setIsOpen(false)}
-              className="text-2xl text-white"
-            >
+            <button onClick={() => setIsOpen(false)} className="text-2xl text-white">
               ✕
             </button>
           </div>
 
           <div className="flex flex-col gap-6 text-lg">
-
             {token ? (
               <>
-                <button
-                  onClick={() => {
-                    navigate("/track-complaints");
-                    setIsOpen(false);
-                  }}
-                >
+                <button onClick={() => { navigate("/track-complaints"); setIsOpen(false); }}>
                   Track Complaint
                 </button>
 
-                <button
-                  onClick={() => {
-                    navigate("/file-complaint");
-                    setIsOpen(false);
-                  }}
-                >
+                <button onClick={() => { navigate("/file-complaint"); setIsOpen(false); }}>
                   File a Complaint
                 </button>
 
-                <button
-                  onClick={handleLogout}
-                  className="mt-4 border border-white px-4 py-2 rounded-xl"
-                >
+                <button onClick={handleLogout} className="mt-4 border border-white px-4 py-2 rounded-xl">
                   Logout
                 </button>
               </>
@@ -208,36 +182,22 @@ const Navbar = () => {
                   For Businesses
                 </button>
 
-                <button
-                  onClick={() => {
-                    navigate("/brands");
-                    setIsOpen(false);
-                  }}
-                >
+                <button onClick={() => { navigate("/brands"); setIsOpen(false); }}>
                   Brands
                 </button>
 
-                <button
-                  onClick={() => {
-                    navigate("/login");
-                    setIsOpen(false);
-                  }}
-                >
+                <button onClick={() => { navigate("/login"); setIsOpen(false); }}>
                   My Complaints
                 </button>
 
                 <button
-                  onClick={() => {
-                    navigate("/file-complaint");
-                    setIsOpen(false);
-                  }}
+                  onClick={() => { navigate("/file-complaint"); setIsOpen(false); }}
                   className="bg-orange-500 px-5 py-3 rounded-lg mt-4"
                 >
                   File a Complaint
                 </button>
               </>
             )}
-
           </div>
         </div>
       </div>
