@@ -134,11 +134,13 @@ const Login = ({ setIsAuthenticated }) => {
           </div>
 
           {/* GOOGLE LOGIN */}
-          <div className="mb-3">
+          <div className="mb-4 flex justify-center">
+            <div className="w-full max-w-xs">
             <GoogleLogin
               onSuccess={handleGoogleLogin}
               onError={() => console.log("Google login failed")}
             />
+          </div>
           </div>
 
 

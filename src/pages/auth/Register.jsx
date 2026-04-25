@@ -113,11 +113,13 @@ const Register = () => {
           )}
 
           {/* ✅ GOOGLE LOGIN */}
-          <div className="mb-4">
+          <div className="mb-4 flex justify-center">
+            <div className="w-full max-w-xs">
             <GoogleLogin
               onSuccess={handleGoogleLogin}
               onError={() => setError("Google signup failed")}
             />
+          </div>
           </div>
 
           {/* divider */}
