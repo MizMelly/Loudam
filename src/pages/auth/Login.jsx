@@ -16,6 +16,8 @@ const Login = ({ setIsAuthenticated }) => {
   const [resetLoading, setResetLoading] = useState(false);
   const [resetMessage, setResetMessage] = useState('');
 
+  const API = "https://loudambackend.onrender.com";
+
   // ================= EMAIL LOGIN =================
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,18 +25,15 @@ const Login = ({ setIsAuthenticated }) => {
     setError('');
 
     try {
-      const response = await fetch(
-        'https://loudambackend.onrender.com/api/auth/login',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData),
-        }
-      );
+      const response = await fetch(`${API}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
 
       const data = await response.json();
 
-      if (response.ok && data.success && data.token) {
+      if (response.ok && data.token) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user || {}));
 
@@ -42,11 +41,9 @@ const Login = ({ setIsAuthenticated }) => {
 
         const decoded = JSON.parse(atob(data.token.split('.')[1]));
 
-        if (decoded.role === 'admin') {
-          navigate('/admin', { replace: true });
-        } else {
-          navigate('/dashboard', { replace: true });
-        }
+        navigate(decoded.role === 'admin' ? '/admin' : '/dashboard', {
+          replace: true,
+        });
       } else {
         setError(data.message || "Invalid email or password");
       }
@@ -58,6 +55,41 @@ const Login = ({ setIsAuthenticated }) => {
     }
   };
 
+  // ================= GOOGLE LOGIN =================
+  const handleGoogleLogin = async (credentialResponse) => {
+    try {
+      const res = await fetch(`${API}/api/auth/google`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          token: credentialResponse.credential,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.token) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+        setIsAuthenticated(true);
+
+        const decoded = JSON.parse(atob(data.token.split(".")[1]));
+
+        navigate(decoded.role === "admin" ? "/admin" : "/dashboard", {
+          replace: true,
+        });
+      }
+    } catch (err) {
+      console.log("Google login error:", err);
+    }
+  };
+
+  // ================= APPLE LOGIN (RESTORED UI SAFE) =================
+  const handleAppleLogin = () => {
+    alert("Apple Login is not configured yet.");
+  };
+
   // ================= FORGOT PASSWORD =================
   const handleForgotPassword = async (e) => {
     e.preventDefault();
@@ -65,14 +97,11 @@ const Login = ({ setIsAuthenticated }) => {
     setResetMessage('');
 
     try {
-      const res = await fetch(
-        "https://loudambackend.onrender.com/api/auth/forgot-password",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: resetEmail })
-        }
-      );
+      const res = await fetch(`${API}/api/auth/forgot-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: resetEmail })
+      });
 
       const data = await res.json();
 
@@ -97,7 +126,6 @@ const Login = ({ setIsAuthenticated }) => {
       <div className="grow flex items-center justify-center px-4 py-10">
         <div className="bg-white w-full max-w-md rounded-3xl shadow-xl p-8">
 
-          {/* HEADER */}
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold">Welcome Back</h1>
             <p className="text-gray-500 text-sm mt-2">
@@ -105,54 +133,19 @@ const Login = ({ setIsAuthenticated }) => {
             </p>
           </div>
 
-          {/* ================= GOOGLE LOGIN ================= */}
+          {/* GOOGLE LOGIN */}
           <div className="mb-3">
             <GoogleLogin
-              onSuccess={async (credentialResponse) => {
-                try {
-                  const res = await fetch(
-                    "https://loudambackend.onrender.com/api/auth/google",
-                    {
-                      method: "POST",
-                      headers: {
-                        "Content-Type": "application/json",
-                      },
-                      body: JSON.stringify({
-                        token: credentialResponse.credential,
-                      }),
-                    }
-                  );
-
-                  const data = await res.json();
-
-                  if (res.ok && data.token) {
-                    localStorage.setItem("token", data.token);
-                    localStorage.setItem("user", JSON.stringify(data.user));
-
-                    setIsAuthenticated(true);
-
-                    const decoded = JSON.parse(
-                      atob(data.token.split(".")[1])
-                    );
-
-                    if (decoded.role === "admin") {
-                      navigate("/admin", { replace: true });
-                    } else {
-                      navigate("/dashboard", { replace: true });
-                    }
-                  }
-                } catch (err) {
-                  console.log(err);
-                }
-              }}
-              onError={() => {
-                console.log("Google login failed");
-              }}
+              onSuccess={handleGoogleLogin}
+              onError={() => console.log("Google login failed")}
             />
           </div>
 
-          {/* ================= APPLE (UI ONLY) ================= */}
-          <button className="w-full border border-gray-300 rounded-xl py-3 flex items-center justify-center gap-3 hover:bg-gray-50 transition mb-3">
+          {/* APPLE LOGIN (RESTORED EXACT UI) */}
+          <button
+            onClick={handleAppleLogin}
+            className="w-full border border-gray-300 rounded-xl py-3 flex items-center justify-center gap-3 hover:bg-gray-50 transition mb-3"
+          >
             <span className="text-lg"></span>
             <span className="text-gray-700 font-medium">
               Continue with Apple
@@ -168,16 +161,16 @@ const Login = ({ setIsAuthenticated }) => {
             <div className="flex-1 h-px bg-gray-300"></div>
           </div>
 
-          {/* ================= EMAIL LOGIN ================= */}
+          {/* ERROR */}
+          {error && (
+            <p className="text-red-500 text-sm text-center bg-red-50 p-3 rounded-xl">
+              {error}
+            </p>
+          )}
+
+          {/* EMAIL LOGIN */}
           <form onSubmit={handleSubmit} className="space-y-5">
 
-            {error && (
-              <p className="text-red-500 text-sm text-center bg-red-50 p-3 rounded-xl">
-                {error}
-              </p>
-            )}
-
-            {/* EMAIL */}
             <input
               type="email"
               placeholder="Email"
@@ -189,7 +182,6 @@ const Login = ({ setIsAuthenticated }) => {
               required
             />
 
-            {/* PASSWORD */}
             <div>
               <input
                 type="password"
@@ -217,11 +209,12 @@ const Login = ({ setIsAuthenticated }) => {
             >
               {loading ? "Signing in..." : "Sign In"}
             </button>
+
           </form>
         </div>
       </div>
 
-      {/* ================= FORGOT PASSWORD MODAL ================= */}
+      {/* FORGOT PASSWORD MODAL */}
       {showForgot && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center px-4 z-50">
 
@@ -230,10 +223,6 @@ const Login = ({ setIsAuthenticated }) => {
             <h2 className="text-xl font-semibold mb-2">
               Forgot Password
             </h2>
-
-            <p className="text-sm text-gray-500 mb-4">
-              Enter your email to reset password
-            </p>
 
             <form onSubmit={handleForgotPassword} className="space-y-4">
 
@@ -269,6 +258,7 @@ const Login = ({ setIsAuthenticated }) => {
               </button>
 
             </form>
+
           </div>
         </div>
       )}
