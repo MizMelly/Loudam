@@ -85,11 +85,6 @@ const Login = ({ setIsAuthenticated }) => {
     }
   };
 
-  // ================= APPLE LOGIN (RESTORED UI SAFE) =================
-  const handleAppleLogin = () => {
-    alert("Apple Login is not configured yet.");
-  };
-
   // ================= FORGOT PASSWORD =================
   const handleForgotPassword = async (e) => {
     e.preventDefault();
@@ -136,10 +131,12 @@ const Login = ({ setIsAuthenticated }) => {
           {/* GOOGLE LOGIN */}
           <div className="mb-4 flex justify-center">
             <div className="w-full max-w-xs">
+               <div style={{ width: "100%" }}>
             <GoogleLogin
               onSuccess={handleGoogleLogin}
               onError={() => console.log("Google login failed")}
             />
+          </div>
           </div>
           </div>
 
