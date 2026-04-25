@@ -288,3 +288,7 @@ body {
 .animate-scroll {
   animation: scroll 25s linear infinite;
 }
+iframe[src*="accounts.google.com"] {
+  margin: 0 auto !important;
+  display: block !important;
+}

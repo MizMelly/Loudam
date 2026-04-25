@@ -112,17 +112,17 @@ const Register = () => {
             <p className="text-red-500 mb-4 text-center">{error}</p>
           )}
 
-          {/* ✅ GOOGLE LOGIN */}
-          <div className="mb-4 flex justify-center">
-            <div className="w-full max-w-xs">
-              <div style={{ width: "100%" }}>
-            <GoogleLogin
-              onSuccess={handleGoogleLogin}
-              onError={() => setError("Google signup failed")}
-            />
-          </div>
-          </div>
-          </div>
+         {/* GOOGLE LOGIN */}
+<div className="mb-4 w-full flex justify-center">
+  <div className="w-full flex justify-center">
+    <div className="inline-flex justify-center">
+      <GoogleLogin
+        onSuccess={handleGoogleLogin}
+        onError={() => setError("Google signup failed")}
+      />
+    </div>
+  </div>
+</div>
 
           {/* divider */}
           <div className="flex items-center gap-4 my-6">

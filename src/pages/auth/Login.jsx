@@ -129,16 +129,16 @@ const Login = ({ setIsAuthenticated }) => {
           </div>
 
           {/* GOOGLE LOGIN */}
-          <div className="mb-4 flex justify-center">
-            <div className="w-full max-w-xs">
-               <div style={{ width: "100%" }}>
-            <GoogleLogin
-              onSuccess={handleGoogleLogin}
-              onError={() => console.log("Google login failed")}
-            />
-          </div>
-          </div>
-          </div>
+<div className="mb-4 w-full flex justify-center">
+  <div className="w-full flex justify-center">
+    <div className="inline-flex justify-center">
+      <GoogleLogin
+        onSuccess={handleGoogleLogin}
+        onError={() => setError("Google signup failed")}
+      />
+    </div>
+  </div>
+</div>
 
 
           {/* DIVIDER */}
