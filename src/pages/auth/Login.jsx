@@ -209,7 +209,16 @@ const Login = ({ setIsAuthenticated }) => {
             >
               {loading ? "Signing in..." : "Sign In"}
             </button>
-
+{/* 👇 ADD THIS BACK */}
+<p className="text-center text-sm text-gray-500 mt-4">
+  Don’t have an account?{" "}
+  <span
+    onClick={() => navigate("/register")}
+    className="text-orange-500 cursor-pointer hover:underline font-medium"
+  >
+    Register
+  </span>
+</p>
           </form>
         </div>
       </div>
