@@ -63,7 +63,7 @@ const Footer = () => {
     </a>
 
     <a
-      href="https://facebook.com/loudamnaija"
+      href="https://www.facebook.com/share/1AMJ8VPXiJ/"
       target="_blank"
       rel="noreferrer"
       className="hover:text-blue-400 transition transform hover:scale-110"
