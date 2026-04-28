@@ -7,6 +7,7 @@ const AdminDashboard = () => {
   const [complaints, setComplaints] = useState([]);
   const [search, setSearch] = useState("");
   const [businessSearch, setBusinessSearch] = useState("");
+  const [trackingSearch, setTrackingSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [page, setPage] = useState(1);
 
@@ -74,8 +75,10 @@ const AdminDashboard = () => {
     return complaints.filter((c) => {
       const s = search.toLowerCase();
       const b = businessSearch.toLowerCase();
+      const t = trackingSearch.toLowerCase();
 
       const matchSearch =
+        search === "" ||
         c.email?.toLowerCase().includes(s) ||
         c.subject?.toLowerCase().includes(s) ||
         c.business_name?.toLowerCase().includes(s);
@@ -84,12 +87,16 @@ const AdminDashboard = () => {
         businessSearch === "" ||
         c.business_name?.toLowerCase().includes(b);
 
+      const matchTracking =
+        trackingSearch === "" ||
+        c.tracking_id?.toLowerCase().includes(t);
+
       const matchStatus =
         statusFilter === "All" || c.status === statusFilter;
 
-      return matchSearch && matchBusiness && matchStatus;
+      return matchSearch && matchBusiness && matchTracking && matchStatus;
     });
-  }, [complaints, search, businessSearch, statusFilter]);
+  }, [complaints, search, businessSearch, trackingSearch, statusFilter]);
 
   // 📄 PAGINATION
   const totalPages = Math.ceil(filteredComplaints.length / PAGE_SIZE);
@@ -100,14 +107,23 @@ const AdminDashboard = () => {
   );
 
   // 📊 STATS
-  const stats = useMemo(() => {
-    return {
-      total: complaints.length,
-      pending: complaints.filter((c) => c.status === "Pending").length,
-      inProgress: complaints.filter((c) => c.status === "In Progress").length,
-      resolved: complaints.filter((c) => c.status === "Resolved").length,
-    };
-  }, [complaints]);
+ const stats = useMemo(() => {
+  return {
+    total: complaints.length,
+
+    pending: complaints.filter(
+      (c) => c.status?.trim().toLowerCase() === "pending"
+    ).length,
+
+    inProgress: complaints.filter(
+      (c) => c.status?.trim().toLowerCase() === "in progress"
+    ).length,
+
+    resolved: complaints.filter(
+      (c) => c.status?.trim().toLowerCase() === "resolved"
+    ).length,
+  };
+}, [complaints]);
 
   const resolvedPercent = stats.total
     ? Math.round((stats.resolved / stats.total) * 100)
@@ -143,7 +159,7 @@ const AdminDashboard = () => {
 
         <input
           className="w-full p-2 border rounded"
-          placeholder="Search email or subject..."
+          placeholder="Search email, subject..."
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);
@@ -157,6 +173,16 @@ const AdminDashboard = () => {
           value={businessSearch}
           onChange={(e) => {
             setBusinessSearch(e.target.value);
+            setPage(1);
+          }}
+        />
+
+        <input
+          className="w-full p-2 border rounded"
+          placeholder="Search tracking ID..."
+          value={trackingSearch}
+          onChange={(e) => {
+            setTrackingSearch(e.target.value);
             setPage(1);
           }}
         />
@@ -176,11 +202,12 @@ const AdminDashboard = () => {
         </select>
       </div>
 
-      {/* 💻 TABLE (DESKTOP ONLY) */}
+      {/* TABLE */}
       <div className="hidden md:block bg-white/90 shadow rounded-xl overflow-x-auto">
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>
+              <th className="p-3 text-left">Tracking ID</th>
               <th className="p-3 text-left">Email</th>
               <th className="p-3 text-left">Business</th>
               <th className="p-3 text-left">Subject</th>
@@ -192,6 +219,14 @@ const AdminDashboard = () => {
           <tbody>
             {paginated.map((c) => (
               <tr key={c.id} className="border-b hover:bg-gray-50">
+
+                <td
+                  className="p-3 font-mono text-blue-600 cursor-pointer hover:underline"
+                  onClick={() => setTrackingSearch(c.tracking_id)}
+                >
+                  {c.tracking_id}
+                </td>
+
                 <td className="p-3">{c.email}</td>
                 <td className="p-3 font-medium">{c.business_name}</td>
                 <td className="p-3">{c.subject}</td>
@@ -225,13 +260,11 @@ const AdminDashboard = () => {
         )}
       </div>
 
-      {/* 📱 MOBILE CARDS */}
+      {/* MOBILE */}
       <div className="md:hidden space-y-3">
         {paginated.map((c) => (
-          <div
-            key={c.id}
-            className="bg-white rounded-xl shadow p-4 border"
-          >
+          <div key={c.id} className="bg-white rounded-xl shadow p-4 border">
+
             <div className="flex justify-between mb-2">
               <p className="font-semibold text-sm">
                 {c.business_name}
@@ -241,33 +274,26 @@ const AdminDashboard = () => {
               </span>
             </div>
 
-            <p className="text-sm text-gray-600">
-              <span className="font-medium text-black">Email:</span>{" "}
-              {c.email}
+            <p className="text-sm text-blue-600 font-mono mb-1">
+              {c.tracking_id}
             </p>
 
+            <p className="text-sm text-gray-600">Email: {c.email}</p>
             <p className="text-sm text-gray-600 mb-2">
-              <span className="font-medium text-black">Subject:</span>{" "}
-              {c.subject}
+              Subject: {c.subject}
             </p>
 
-            <div className="flex justify-between items-center">
-              <select
-                value={c.status}
-                onChange={(e) =>
-                  updateStatus(c.id, e.target.value)
-                }
-                className="border p-1 rounded text-sm"
-              >
-                <option>Pending</option>
-                <option>In Progress</option>
-                <option>Resolved</option>
-              </select>
-
-              <span className="text-xs text-gray-500">
-                {c.status}
-              </span>
-            </div>
+            <select
+              value={c.status}
+              onChange={(e) =>
+                updateStatus(c.id, e.target.value)
+              }
+              className="border p-1 rounded text-sm w-full"
+            >
+              <option>Pending</option>
+              <option>In Progress</option>
+              <option>Resolved</option>
+            </select>
           </div>
         ))}
       </div>

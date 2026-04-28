@@ -22,8 +22,6 @@ const FileComplaint = () => {
   const [proof, setProof] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
-  const [trackingId, setTrackingId] = useState('');
 
   const token = localStorage.getItem('token');
 
@@ -68,25 +66,8 @@ const FileComplaint = () => {
       const result = await res.json();
 
       if (res.ok && result.success) {
-        setSuccess(true);
-        setTrackingId(result.trackingId);
-
-        alert(`Complaint submitted!\nTracking ID: ${result.trackingId}`);
-
-        setFormData({
-          full_name: '',
-          phone_number: '',
-          email: '',
-          country: 'Nigeria',
-          social_handle: '',
-          business_name: '',
-          category: '',
-          subject: '',
-          description: '',
-          desiredResolution: ''
-        });
-
-        setProof(null);
+        navigate("/thank-you");
+        return;
       } else {
         setError(result.message || "Submission failed");
       }
@@ -120,13 +101,6 @@ const FileComplaint = () => {
           <p className="text-gray-600 mb-8 md:mb-10 text-sm md:text-base">
             No login required to submit. {token && "You are currently logged in."}
           </p>
-
-          {success && (
-            <div className="bg-green-100 border border-green-400 text-green-700 px-4 md:px-6 py-4 md:py-5 rounded-2xl mb-6 md:mb-8 text-sm md:text-base">
-              Complaint submitted successfully!<br />
-              Tracking ID: <strong>{trackingId}</strong>
-            </div>
-          )}
 
           {error && (
             <p className="text-red-600 bg-red-50 p-3 md:p-4 rounded-xl mb-6 text-sm md:text-base">

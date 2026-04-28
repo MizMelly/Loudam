@@ -8,6 +8,7 @@ import ForgotPassword from './pages/auth/ForgotPassword';
 import Dashboard from './pages/dashboard/Dashboard';
 import FileComplaint from './pages/complaint/FileComplaint';
 import TrackComplaints from './pages/complaint/TrackComplaints';
+import ThankYou from './pages/complaint/ThankYou';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import Brands from './components/brands/brands';
 
@@ -63,6 +64,8 @@ const App = () => {
           <TrackComplaints />
         </ProtectedRoute>
       } />
+
+      <Route path="/thank-you" element={<ThankYou />} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
       <Route path="/admin" element={<AdminDashboard />} />
