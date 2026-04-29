@@ -9,6 +9,8 @@ const AdminDashboard = () => {
   const [businessSearch, setBusinessSearch] = useState("");
   const [trackingSearch, setTrackingSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [selectedComplaint, setSelectedComplaint] = useState(null);
+  const [showModal, setShowModal] = useState(false);
   const [page, setPage] = useState(1);
 
   const navigate = useNavigate();
@@ -16,6 +18,11 @@ const AdminDashboard = () => {
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/");
+  };
+
+  const openComplaintDetails = (complaint) => {
+    setSelectedComplaint(complaint);
+    setShowModal(true);
   };
 
   useEffect(() => {
@@ -92,7 +99,8 @@ const AdminDashboard = () => {
         c.tracking_id?.toLowerCase().includes(t);
 
       const matchStatus =
-        statusFilter === "All" || c.status === statusFilter;
+        statusFilter === "All" ||
+        c.status?.trim().toLowerCase() === statusFilter.toLowerCase();
 
       return matchSearch && matchBusiness && matchTracking && matchStatus;
     });
@@ -107,223 +115,235 @@ const AdminDashboard = () => {
   );
 
   // 📊 STATS
- const stats = useMemo(() => {
-  return {
-    total: complaints.length,
-
-    pending: complaints.filter(
-      (c) => c.status?.trim().toLowerCase() === "pending"
-    ).length,
-
-    inProgress: complaints.filter(
-      (c) => c.status?.trim().toLowerCase() === "in progress"
-    ).length,
-
-    resolved: complaints.filter(
-      (c) => c.status?.trim().toLowerCase() === "resolved"
-    ).length,
-  };
-}, [complaints]);
+  const stats = useMemo(() => {
+    return {
+      total: complaints.length,
+      pending: complaints.filter(
+        (c) => c.status?.trim().toLowerCase() === "pending"
+      ).length,
+      inProgress: complaints.filter(
+        (c) => c.status?.trim().toLowerCase() === "in progress"
+      ).length,
+      resolved: complaints.filter(
+        (c) => c.status?.trim().toLowerCase() === "resolved"
+      ).length,
+    };
+  }, [complaints]);
 
   const resolvedPercent = stats.total
     ? Math.round((stats.resolved / stats.total) * 100)
     : 0;
+return (
+  <div className="min-h-screen p-4 sm:p-6 bg-linear-to-br from-slate-100 via-blue-100 to-indigo-200">
 
-  return (
-    <div className="min-h-screen p-4 sm:p-6 bg-linear-to-br from-slate-300 via-blue-150 to-indigo-300">
+    {/* HEADER */}
+    <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-3">
+      <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+        Admin Dashboard
+      </h1>
 
-      {/* HEADER */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-        <h1 className="text-2xl sm:text-3xl font-bold">
-          Admin Dashboard
-        </h1>
-
-        <button
-          onClick={handleLogout}
-          className="bg-white border border-red-500 text-red-500 hover:bg-red-500 hover:text-white px-4 py-2 rounded-xl transition w-full sm:w-auto"
-        >
-          Logout
-        </button>
-      </div>
-
-      {/* ANALYTICS */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-        <Card title="Total" value={stats.total} />
-        <Card title="Pending" value={stats.pending} />
-        <Card title="In Progress" value={stats.inProgress} />
-        <Card title="Resolved %" value={`${resolvedPercent}%`} />
-      </div>
-
-      {/* SEARCH */}
-      <div className="flex flex-col md:flex-row gap-3 mb-4">
-
-        <input
-          className="w-full p-2 border rounded"
-          placeholder="Search email, subject..."
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(1);
-          }}
-        />
-
-        <input
-          className="w-full p-2 border rounded"
-          placeholder="Search business..."
-          value={businessSearch}
-          onChange={(e) => {
-            setBusinessSearch(e.target.value);
-            setPage(1);
-          }}
-        />
-
-        <input
-          className="w-full p-2 border rounded"
-          placeholder="Search tracking ID..."
-          value={trackingSearch}
-          onChange={(e) => {
-            setTrackingSearch(e.target.value);
-            setPage(1);
-          }}
-        />
-
-        <select
-          className="w-full md:w-auto p-2 border rounded"
-          value={statusFilter}
-          onChange={(e) => {
-            setStatusFilter(e.target.value);
-            setPage(1);
-          }}
-        >
-          <option>All</option>
-          <option>Pending</option>
-          <option>In Progress</option>
-          <option>Resolved</option>
-        </select>
-      </div>
-
-      {/* TABLE */}
-      <div className="hidden md:block bg-white/90 shadow rounded-xl overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="p-3 text-left">Tracking ID</th>
-              <th className="p-3 text-left">Email</th>
-              <th className="p-3 text-left">Business</th>
-              <th className="p-3 text-left">Subject</th>
-              <th className="p-3 text-left">Status</th>
-              <th className="p-3 text-left">Date</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {paginated.map((c) => (
-              <tr key={c.id} className="border-b hover:bg-gray-50">
-
-                <td
-                  className="p-3 font-mono text-blue-600 cursor-pointer hover:underline"
-                  onClick={() => setTrackingSearch(c.tracking_id)}
-                >
-                  {c.tracking_id}
-                </td>
-
-                <td className="p-3">{c.email}</td>
-                <td className="p-3 font-medium">{c.business_name}</td>
-                <td className="p-3">{c.subject}</td>
-
-                <td className="p-3">
-                  <select
-                    value={c.status}
-                    onChange={(e) =>
-                      updateStatus(c.id, e.target.value)
-                    }
-                    className="border p-1 rounded"
-                  >
-                    <option>Pending</option>
-                    <option>In Progress</option>
-                    <option>Resolved</option>
-                  </select>
-                </td>
-
-                <td className="p-3 text-sm text-gray-600">
-                  {new Date(c.created_at).toLocaleDateString()}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {paginated.length === 0 && (
-          <div className="p-6 text-center text-gray-500">
-            No complaints found
-          </div>
-        )}
-      </div>
-
-      {/* MOBILE */}
-      <div className="md:hidden space-y-3">
-        {paginated.map((c) => (
-          <div key={c.id} className="bg-white rounded-xl shadow p-4 border">
-
-            <div className="flex justify-between mb-2">
-              <p className="font-semibold text-sm">
-                {c.business_name}
-              </p>
-              <span className="text-xs text-gray-500">
-                {new Date(c.created_at).toLocaleDateString()}
-              </span>
-            </div>
-
-            <p className="text-sm text-blue-600 font-mono mb-1">
-              {c.tracking_id}
-            </p>
-
-            <p className="text-sm text-gray-600">Email: {c.email}</p>
-            <p className="text-sm text-gray-600 mb-2">
-              Subject: {c.subject}
-            </p>
-
-            <select
-              value={c.status}
-              onChange={(e) =>
-                updateStatus(c.id, e.target.value)
-              }
-              className="border p-1 rounded text-sm w-full"
-            >
-              <option>Pending</option>
-              <option>In Progress</option>
-              <option>Resolved</option>
-            </select>
-          </div>
-        ))}
-      </div>
-
-      {/* PAGINATION */}
-      <div className="flex flex-wrap justify-center gap-2 mt-4">
-        {Array.from({ length: totalPages }, (_, i) => (
-          <button
-            key={i}
-            onClick={() => setPage(i + 1)}
-            className={`px-3 py-1 rounded border ${
-              page === i + 1
-                ? "bg-black text-white"
-                : "bg-white hover:bg-gray-100"
-            }`}
-          >
-            {i + 1}
-          </button>
-        ))}
-      </div>
+      <button
+        onClick={handleLogout}
+        className="bg-white border border-red-500 text-red-500 hover:bg-red-500 hover:text-white px-4 py-2 rounded-xl transition"
+      >
+        Logout
+      </button>
     </div>
-  );
-};
 
-// 📦 CARD
-const Card = ({ title, value }) => (
-  <div className="bg-white p-3 sm:p-4 shadow rounded-xl border text-center">
-    <p className="text-gray-500 text-sm">{title}</p>
-    <p className="text-xl sm:text-2xl font-bold">{value}</p>
+    {/* STATS */}
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <Card title="Total" value={stats.total} />
+      <Card title="Pending" value={stats.pending} />
+      <Card title="In Progress" value={stats.inProgress} />
+      <Card title="Resolved %" value={`${resolvedPercent}%`} />
+    </div>
+
+    {/* SEARCH BAR */}
+    <div className="bg-white p-4 rounded-xl shadow mb-6 flex flex-col md:flex-row gap-3">
+      <input
+        className="flex-1 p-2 border rounded"
+        placeholder="Search email or subject..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+
+      <input
+        className="flex-1 p-2 border rounded"
+        placeholder="Business..."
+        value={businessSearch}
+        onChange={(e) => setBusinessSearch(e.target.value)}
+      />
+
+      <input
+        className="flex-1 p-2 border rounded"
+        placeholder="Tracking ID..."
+        value={trackingSearch}
+        onChange={(e) => setTrackingSearch(e.target.value)}
+      />
+
+      <select
+        className="p-2 border rounded"
+        value={statusFilter}
+        onChange={(e) => setStatusFilter(e.target.value)}
+      >
+        <option>All</option>
+        <option>Pending</option>
+        <option>In Progress</option>
+        <option>Resolved</option>
+      </select>
+    </div>
+
+    {/* TABLE */}
+    <div className="hidden md:block bg-white shadow rounded-xl overflow-hidden">
+      <table className="w-full text-sm">
+        <thead className="bg-gray-100 text-gray-600">
+          <tr>
+            <th className="p-3 text-left">Tracking</th>
+            <th className="p-3 text-left">Email</th>
+            <th className="p-3 text-left">Business</th>
+            <th className="p-3 text-left">Subject</th>
+            <th className="p-3 text-left">Status</th>
+            <th className="p-3 text-left">Date</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {paginated.map((c) => (
+            <tr
+              key={c.id}
+              onClick={() => openComplaintDetails(c)}
+              className="border-b hover:bg-gray-50 cursor-pointer"
+            >
+              <td className="p-3 text-blue-600 font-mono">
+                {c.tracking_id}
+              </td>
+
+              <td className="p-3">{c.email}</td>
+              <td className="p-3 font-medium">{c.business_name}</td>
+              <td className="p-3">{c.subject}</td>
+
+              <td
+                className="p-3"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <select
+                  value={c.status}
+                  onChange={(e) =>
+                    updateStatus(c.id, e.target.value)
+                  }
+                  className="border p-1 rounded"
+                >
+                  <option>Pending</option>
+                  <option>In Progress</option>
+                  <option>Resolved</option>
+                </select>
+              </td>
+
+              <td className="p-3 text-gray-500">
+                {new Date(c.created_at).toLocaleDateString()}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {paginated.length === 0 && (
+        <div className="p-6 text-center text-gray-500">
+          No complaints found
+        </div>
+      )}
+    </div>
+
+    {/* MOBILE CARDS */}
+    <div className="md:hidden space-y-4">
+      {paginated.map((c) => (
+        <div
+          key={c.id}
+          onClick={() => openComplaintDetails(c)}
+          className="bg-white rounded-xl shadow p-4 border cursor-pointer"
+        >
+          <div className="flex justify-between mb-2">
+            <p className="font-semibold">{c.business_name}</p>
+            <span className="text-xs text-gray-500">
+              {new Date(c.created_at).toLocaleDateString()}
+            </span>
+          </div>
+
+          <p className="text-blue-600 font-mono mb-1">
+            {c.tracking_id}
+          </p>
+
+          <p className="text-sm text-gray-600">{c.email}</p>
+          <p className="text-sm text-gray-600 mb-2">
+            {c.subject}
+          </p>
+
+          <select
+            value={c.status}
+            onClick={(e) => e.stopPropagation()}
+            onChange={(e) =>
+              updateStatus(c.id, e.target.value)
+            }
+            className="border p-2 rounded w-full"
+          >
+            <option>Pending</option>
+            <option>In Progress</option>
+            <option>Resolved</option>
+          </select>
+        </div>
+      ))}
+    </div>
+
+    {/* PAGINATION */}
+    <div className="flex justify-center gap-2 mt-6">
+      {Array.from({ length: totalPages }, (_, i) => (
+        <button
+          key={i}
+          onClick={() => setPage(i + 1)}
+          className={`px-3 py-1 rounded ${
+            page === i + 1
+              ? "bg-black text-white"
+              : "bg-white border"
+          }`}
+        >
+          {i + 1}
+        </button>
+      ))}
+    </div>
+
+    {/* MODAL */}
+    {showModal && selectedComplaint && (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div className="bg-white rounded-xl p-6 max-w-lg w-full relative">
+          <button
+            onClick={() => setShowModal(false)}
+            className="absolute top-3 right-3 text-xl"
+          >
+            ×
+          </button>
+
+          <h2 className="text-xl font-bold mb-4">
+            Complaint Details
+          </h2>
+
+          <p><strong>ID:</strong> {selectedComplaint.tracking_id}</p>
+          <p><strong>Email:</strong> {selectedComplaint.email}</p>
+          <p className="mt-3 text-gray-600">
+            {selectedComplaint.description}
+          </p>
+        </div>
+      </div>
+    )}
   </div>
 );
+};
+
+const Card = ({ title, value }) => (
+  <div className="bg-white p-4 rounded text-center shadow">
+    <p>{title}</p>
+    <h2>{value}</h2>
+  </div>
+);
+
 
 export default AdminDashboard;
